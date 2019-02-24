@@ -1,6 +1,19 @@
 <h1>Angular Router</h1>
 <nav>
-  <a style="margin: 5px" routerLink="/crisis-center" routerLinkActive="active">Crisis Center</a>
-  <a style="margin: 5px" routerLink="/heroes" routerLinkActive="active">Heroes</a>
+  <a style="margin: 5px"
+     routerLink="/crisis-center"
+     routerLinkActive="active"
+  >
+    Crisis Center
+  </a>
+  <a style="margin: 5px"
+     routerLink="/heroes"
+     routerLinkActive="active"
+  >
+    Heroes
+  </a>
 </nav>
-<router-outlet></router-outlet>
+<div [@routeAnimation]="getAnimationData(routerOutlet)">
+  <router-outlet #routerOutlet="outlet"></router-outlet>
+</div>
+<router-outlet name="popup"></router-outlet>

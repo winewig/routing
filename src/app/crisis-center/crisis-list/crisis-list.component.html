@@ -1,12 +1,11 @@
-<h2>HEROES</h2>
-<ul class="heroes">
-  <li *ngFor="let hero of heroes$ | async"
-      [class.heroes-selected]="hero.id === selectedId"
-      (click)="onSelect(hero)">
-    <a [routerLink]="['/hero', hero.id]">
-      <span class="badge">{{hero.id}}</span> {{hero.name}}
+<ul class="crises">
+  <li *ngFor="let crisis of crises$ | async"
+      [class.selected]="crisis.id === selectedId">
+    <a [routerLink]="[crisis.id]">
+      <span class="badge">{{ crisis.id }}</span>{{ crisis.name }}
     </a>
   </li>
 </ul>
 
 <button routerLink="/sidekicks">Go to sidekicks</button>
+<router-outlet></router-outlet>

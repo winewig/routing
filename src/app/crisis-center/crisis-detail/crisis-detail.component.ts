@@ -1,12 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import { Component, OnInit, HostBinding } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
-import {switchMap} from 'rxjs/operators';
-import {Observable} from 'rxjs';
-
-import { CrisisService } from '../crisis.service';
 import { Crisis } from '../crisis';
-import { MessageService } from '../message.service';
+import { DialogService } from '../../dialog.service';
 
 @Component({
   selector: 'app-crisis-detail',
@@ -15,38 +12,48 @@ import { MessageService } from '../message.service';
 })
 export class CrisisDetailComponent implements OnInit {
   crisis: Crisis;
-
-
-  @Input() hero: Crisis;
-  private hero$: Observable<Crisis>;
+  editName: string;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private service: CrisisService,
-    private messageService: MessageService
-  ) { }
+    public dialogService: DialogService
+  ) {}
 
   ngOnInit() {
-    this.hero$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => {
-        console.log(`Hero detail gets the route param: ${params.keys}`);
-        return this.service.getCrisis(params.get('id'));
-      })
-    );
+    this.route.data
+      .subscribe((data: { crisis: Crisis }) => {
+        this.editName = data.crisis.name;
+        this.crisis = data.crisis;
+      });
   }
 
-  gotoHeroes(hero: Crisis) {
-    const heroId = hero ? hero.id : null;
-    this.router.navigate(['/heroes', {id: heroId, foo: 'foo'}])
-      .then( () =>
-        console.log('Back to Heroes from hero detail')
-      );
+  cancel() {
+    this.gotoCrises();
+  }
+
+  save() {
+    this.crisis.name = this.editName;
+    this.gotoCrises();
+  }
+
+  canJaDeactivate(): Observable<boolean> | boolean {
+    // Allow synchronous navigation (`true`) if no crisis or the crisis is unchanged
+    if (!this.crisis || this.crisis.name === this.editName) {
+      return true;
+    }
+    // Otherwise ask the user with the dialog service and return its
+    // observable which resolves to true or false when the user decides
+    return this.dialogService.confirm('Discard changes?');
   }
 
   gotoCrises() {
     const crisisId = this.crisis ? this.crisis.id : null;
-    this.router.navigate(['../', {id: crisisId, foo: 'foo'}], {relativeTo: this.route})
-      .then(() => this.messageService.add(`From ${crisisId} back to Crisis Center`));
+    // Pass along the crisis id if available
+    // so that the CrisisListComponent can select that crisis.
+    // Add a totally useless `foo` parameter for kicks.
+    // Relative navigation back to the crises
+    this.router.navigate(['../', { id: crisisId, foo: 'foo' }], { relativeTo: this.route });
   }
 }
+

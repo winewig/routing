@@ -23,7 +23,7 @@ export class CrisisListComponent implements OnInit {
     this.crises$ = this.route.paramMap.pipe(
       switchMap(params => {
         this.selectedId = +params.get('id');
-        console.log(`The selected hero ID was: ${this.selectedId}`);
+        // console.log(`The selected crisis ID was: ${this.selectedId}`);
         return this.crisisService.getCrises();
       })
     );
